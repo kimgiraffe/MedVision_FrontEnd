@@ -77,9 +77,9 @@ class _SignUpPageState extends State<SignUpPage> {
                     onChanged: (value) {
                       setState(() {
                         _isCheckAgreementAll = value!;
-                        _isCheckAgreement1 = true;
-                        _isCheckAgreement2 = true;
-                        _isCheckAgreement3 = true;
+                        _isCheckAgreement1 = _isCheckAgreementAll;
+                        _isCheckAgreement2 = _isCheckAgreementAll;
+                        _isCheckAgreement3 = _isCheckAgreementAll;
                       });
                     }
                 ),
@@ -92,6 +92,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     onChanged: (value) {
                       setState(() {
                         _isCheckAgreement1 = value!;
+                        _isCheckAgreementAll = _isCheckAgreement1 && _isCheckAgreement2 && _isCheckAgreement3;
                       });
                     }
                 ),
@@ -104,6 +105,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     onChanged: (value) {
                       setState(() {
                         _isCheckAgreement2 = value!;
+                        _isCheckAgreementAll = _isCheckAgreement1 && _isCheckAgreement2 && _isCheckAgreement3;
                       });
                     }
                 ),
@@ -116,6 +118,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     onChanged: (value) {
                       setState(() {
                         _isCheckAgreement3 = value!;
+                        _isCheckAgreementAll = _isCheckAgreement1 && _isCheckAgreement2 && _isCheckAgreement3;
                       });
                     }
                 ),
@@ -132,7 +135,34 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          if(!_isCheckAgreement1 || !_isCheckAgreement2 || !_isCheckAgreement3) {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("알림"),
+                                    content: Text("모든 약관에 동의해야 합니다."),
+                                    actions: <Widget>[
+                                      TextButton(onPressed: () {
+                                        Navigator.of(context).pop();
+                                      }, child: Text("확인"))
+                                    ],
+                                  );
+
+                                },
+                            );
+                          }
+
+
+                          else if(_passwordController.text != _passwordconfirmController.text){
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('비밀번호가 일치하지 않습니다')),
+                            );
+                          }
+                          else {
+                            //TODO: 회원가입 로직 (서버에 정보 전송 등)
+                            Navigator.pop(context);
+                          }
                         },
                         child: Text('회원가입'),
                     )

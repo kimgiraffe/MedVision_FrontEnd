@@ -14,6 +14,17 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isLoggedIn = false;
 
+  void NavigateToHome(BuildContext context) {
+    if(isLoggedIn) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()),);
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('로그인이 필요합니다.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,20 +77,30 @@ class _LoginPageState extends State<LoginPage> {
                             isLoggedIn = true;
                           });
                         }
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()),);
+                        NavigateToHome(context);
+                        //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()),);
                       },
                     ),
                   ],
                 ),
                 SizedBox(height: 15.0),
                 Center(
-                  child: InkWell(
-                    child: Text(
-                      '계정이 없으신가요? 회원가입',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                      '계정이 없으신가요? ',
                       style: TextStyle(
                         fontSize: 14.0,
-                        decoration: TextDecoration.underline,
                       ),
+                    ),
+                    InkWell(
+                      child: Text(
+                        '회원가입',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          decoration: TextDecoration.underline,
+                        ),
                     ),
                     onTap: (){
                       Navigator.push(
@@ -88,12 +109,12 @@ class _LoginPageState extends State<LoginPage> {
                       );
                     },
                   ),
-                )
-              ],
-            )
+                ])
+
+            ),
           ],
         ),
-      ),
+      ])),
     );
   }
 }
