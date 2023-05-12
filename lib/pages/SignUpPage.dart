@@ -155,8 +155,19 @@ class _SignUpPageState extends State<SignUpPage> {
 
 
                           else if(_passwordController.text != _passwordconfirmController.text){
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('비밀번호가 일치하지 않습니다')),
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("알림"),
+                                    content: Text("비밀번호가 일치하지 않습니다."),
+                                    actions: <Widget>[
+                                      TextButton(onPressed: (){
+                                        Navigator.of(context).pop();
+                                      }, child: Text("확인"))
+                                    ],
+                                  );
+                                }
                             );
                           }
                           else {

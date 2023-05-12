@@ -39,6 +39,8 @@ dependencies:
   table_calendar: ^3.0.9
   intl: ^0.18.0
   http: ^0.13.6
+  camera: ^0.10.5
+  image_picker: ^0.8.7+5
 
 dev_dependencies:
   flutter_test:
