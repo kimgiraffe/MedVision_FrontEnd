@@ -37,10 +37,12 @@ dependencies:
   cupertino_icons: ^1.0.2
   google_fonts: ^4.0.4
   table_calendar: ^3.0.9
-  intl: ^0.18.0
+  intl: any
   http: ^0.13.6
   camera: ^0.10.5
   image_picker: ^0.8.7+5
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'MedVision_theme.dart';
 import 'package:my_app/pages/LoginPage.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   initializeDateFormatting('ko_KR', '').then((_) =>
@@ -17,6 +18,13 @@ class MedVision extends StatelessWidget {
     final theme = MedVisionTheme.light();
 
     return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('ko', 'KR'),
+      ],
       theme: theme,
       title: 'MedVision',
       home: const Home(),

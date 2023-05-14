@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:my_app/pages/AddSchedulePage.dart';
 import 'package:my_app/pages/SearchPillPage.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:http/http.dart' as http;
-import 'package:my_app/pages/SearchPillPage.dart';
+//import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -21,6 +20,8 @@ class HomeState extends State<Home> {
     Container(),
   ];
 
+  List<MedicationSchedule> _medicationSchedules = [];
+  List<MedicationSchedule> selectedSchedules = [];
   Map<DateTime, List<dynamic>> _events = {};
 
   DateTime selectedDay = DateTime(
@@ -59,6 +60,19 @@ class HomeState extends State<Home> {
       TableCalendar(
         //events: _events;
         // eventLoader: _getEvents,
+
+        eventLoader: (day) {
+          return _events[day] ?? [];
+        },
+        calendarStyle: CalendarStyle(
+          markerDecoration: BoxDecoration(
+            color: Colors.red,
+            shape: BoxShape.circle,
+          ),
+          markerSize: 5.0,
+        ),
+
+
         firstDay: DateTime.utc(2020, 1, 1),
         lastDay: DateTime.utc(2023, 12, 31),
         focusedDay: focusedDay,
@@ -70,13 +84,7 @@ class HomeState extends State<Home> {
           formatButtonVisible: false
         ),
 
-        calendarStyle: CalendarStyle(
-          markerSize: 10.0,
-          markerDecoration: BoxDecoration(
-            color: Colors.red,
-            shape: BoxShape.circle
-          ),
-        ),
+
 
         calendarFormat: format,
         onFormatChanged: (CalendarFormat format){
@@ -86,21 +94,58 @@ class HomeState extends State<Home> {
         },
 
         onDaySelected: (DateTime selectedDay, DateTime focusedDay) {
+          this.selectedDay = selectedDay;
+          this.focusedDay = focusedDay;
+
           setState(() {
-            this.selectedDay = selectedDay;
-            this.focusedDay = focusedDay;
+            selectedSchedules = _events[selectedDay] ?.map((e) => e as MedicationSchedule).toList() ?? [];
           });
         },
+
         selectedDayPredicate: (DateTime day) {
           return isSameDay(selectedDay, day);
-        },
-      ),
+          },
+        ),
+          Column(
+            children: selectedSchedules.map((schedule) {
+              return ListTile(
+                title: Text(schedule.medication),
+                subtitle: Text('시작: ${schedule.startDate}\n종료: ${schedule.endDate}'),
+              );
+            }).toList(),
+          ),
 
           SizedBox(height: 10.0),
           Center(
             child:
           ElevatedButton(
-              onPressed: (){},
+              onPressed: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddSchedulePage(addEvent: (medication, dosagePerOnce, dailyDose, totalDosingDays, startDate, endDate){
+                    MedicationSchedule newSchedule = MedicationSchedule(
+                      medication: medication,
+                      dosagePerOnce: dosagePerOnce,
+                      dailyDose: dailyDose,
+                      totalDosingDays: totalDosingDays,
+                      startDate: DateTime(startDate.year, startDate.month, startDate.day),
+                      endDate: DateTime(endDate.year, endDate.month, endDate.day),
+                    );
+                    setState(() {
+                      _medicationSchedules.add(newSchedule);
+                      for(int i = 0; i <= totalDosingDays; i++){
+                        DateTime date = startDate.add(Duration(days: i));
+                        DateTime keyDate = DateTime(date.year, date.month, date.day);
+                        if(_events[keyDate] != null){
+                          _events[keyDate]!.add(newSchedule);
+                        } else{
+                          _events[keyDate] = [newSchedule];
+                        }
+                      }
+                    });
+                  },)),
+                );
+              },
               child: Text('복약 일정 추가')
             ),
           ),
@@ -204,5 +249,23 @@ class Prescription{
     required this.DosagePerOnce,
     required this.DailyDose,
     required this.TotalDosingDays,
+  });
+}
+
+class MedicationSchedule {
+  String medication;
+  int dosagePerOnce;
+  int dailyDose;
+  int totalDosingDays;
+  DateTime startDate;
+  DateTime endDate;
+
+  MedicationSchedule({
+    required this.medication,
+    required this.dosagePerOnce,
+    required this.dailyDose,
+    required this.totalDosingDays,
+    required this.startDate,
+    required this.endDate,
   });
 }

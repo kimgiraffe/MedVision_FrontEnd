@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/home.dart';
-import 'package:camera/camera.dart';
-import 'package:flutter/semantics.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
