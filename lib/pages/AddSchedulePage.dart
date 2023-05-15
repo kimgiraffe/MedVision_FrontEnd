@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class AddSchedulePage extends StatefulWidget {
   final Function addEvent;
-  AddSchedulePage({required this.addEvent});
+  const AddSchedulePage({Key? key, required this.addEvent}) : super(key: key);
 
   @override
-  _AddSchedulePageState createState() => _AddSchedulePageState();
+  AddSchedulePageState createState() => AddSchedulePageState();
 }
 
-class _AddSchedulePageState extends State<AddSchedulePage> {
+class AddSchedulePageState extends State<AddSchedulePage> {
   final _formKey = GlobalKey<FormState>();
   String medication = '';
   int dosagePerOnce = 0;
@@ -20,13 +20,13 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(centerTitle: true, title: Text('복약 일정 추가')),
+      appBar: AppBar(centerTitle: true, title: const Text('복약 일정 추가')),
       body: Form(
         key: _formKey,
         child: Column(
           children: <Widget>[
             TextFormField(
-              decoration: InputDecoration(labelText: '약품명'),
+              decoration: const InputDecoration(labelText: '약품명'),
               validator: (value) {
                 if(value == null || value.isEmpty) {
                   return '약품명을 입력해주세요.';
@@ -40,7 +40,7 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: '1회 투약량'),
+              decoration: const InputDecoration(labelText: '1회 투약량'),
               validator: (value) {
                 if(value == null || value.isEmpty) {
                   return '1회 투약량을 입력해주세요.';
@@ -54,7 +54,7 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: '1일 투약횟수'),
+              decoration: const InputDecoration(labelText: '1일 투약횟수'),
               validator: (value) {
                 if(value == null || value.isEmpty) {
                   return '1일 투약횟수를 입력해주세요.';
@@ -68,7 +68,7 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: '총 투약일수'),
+              decoration: const InputDecoration(labelText: '총 투약일수'),
               validator: (value) {
                 if(value == null || value.isEmpty) {
                   return '총 투약일수를 입력해주세요.';
@@ -82,13 +82,13 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
               },
             ),
             ElevatedButton(
-              child: Text('복약 시작 날짜 선택'),
+              child: const Text('복약 시작 날짜 선택'),
               onPressed: () async {
                 final DateTime? picked = await showDatePicker(
                     context: context,
                     initialDate: startDate,
                     firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(Duration(days: 30)),
+                    lastDate: DateTime.now().add(const Duration(days: 30)),
                 );
                 if(picked != null && picked != startDate){
                   setState(() {
@@ -98,13 +98,13 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
               },
             ),
             ElevatedButton(
-              child: Text('복약 종료 날짜 선택'),
+              child: const Text('복약 종료 날짜 선택'),
               onPressed: () async {
                 final DateTime? picked = await showDatePicker(
                   context: context,
                   initialDate: endDate,
                   firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(Duration(days:30)),
+                  lastDate: DateTime.now().add(const Duration(days:30)),
                 );
                 if(picked != null && picked != endDate){
                   setState(() {
@@ -115,10 +115,11 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
             ),
 
             ElevatedButton(
-              child: Text('추가'),
+              child: const Text('추가'),
               onPressed: (){
                 if(_formKey.currentState!.validate()){
                   _formKey.currentState!.save();
+                  //print('Event to add: $medication, $dosagePerOnce, $dailyDose, $totalDosingDays, $startDate, $endDate');
                   widget.addEvent(
                     medication,
                     dosagePerOnce,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
-import 'package:flutter/cupertino.dart';
 import 'MedVision_theme.dart';
 import 'package:my_app/pages/LoginPage.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -18,12 +17,12 @@ class MedVision extends StatelessWidget {
     final theme = MedVisionTheme.light();
 
     return MaterialApp(
-      localizationsDelegates: [
+      localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: [
-        const Locale('ko', 'KR'),
+      supportedLocales: const [
+        Locale('ko', 'KR'),
       ],
       theme: theme,
       title: 'MedVision',
@@ -40,7 +39,7 @@ class MedVision extends StatelessWidget {
 
     return MaterialPageRoute<void>(
       settings: settings,
-      builder: (BuildContext context) => LoginPage(),
+      builder: (BuildContext context) => const LoginPage(),
       fullscreenDialog: true,
     );
   }

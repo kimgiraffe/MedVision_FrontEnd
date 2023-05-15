@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
+
   @override
-  _SignUpPageState createState() => _SignUpPageState();
+  SignUpPageState createState() => SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class SignUpPageState extends State<SignUpPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordconfirmController = TextEditingController();
@@ -20,23 +22,23 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('회원가입', textAlign: TextAlign.center, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600, color: Colors.white)),
+        title: const Text('회원가입', textAlign: TextAlign.center, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600, color: Colors.white)),
       ),
-      body: new Form(
+      body: Form(
 
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           children: <Widget>[
-            SizedBox(height: 10.0),
+            const SizedBox(height: 10.0),
             Column(
               children: <Widget>[
-                Text('나만을 위한 꼼꼼한 복약관리,', textAlign: TextAlign.center, style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
-                Text('시작해볼까요?', textAlign: TextAlign.center, style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                const Text('나만을 위한 꼼꼼한 복약관리,', textAlign: TextAlign.center, style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                const Text('시작해볼까요?', textAlign: TextAlign.center, style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
 
-                SizedBox(height: 60.0),
+                const SizedBox(height: 60.0),
                 TextFormField(
                   controller: _usernameController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     filled: true,
                     labelText: '아이디',
                   ),
@@ -44,7 +46,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     filled: true,
                     labelText: '비밀번호',
                   ),
@@ -52,7 +54,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 TextFormField(
                   controller: _passwordconfirmController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     filled: true,
                     labelText: '비밀번호 재확인',
 
@@ -61,17 +63,17 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 TextFormField(
                   controller: _emailController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     filled: true,
                     labelText: '이메일 주소',
                   ),
                   obscureText: false,
                 ),
-                SizedBox(height: 5.0),
+                const SizedBox(height: 5.0),
                 CheckboxListTile(
                     controlAffinity: ListTileControlAffinity.leading,
                     activeColor: Colors.blue,
-                    title: Text('전체 동의'),
+                    title: const Text('전체 동의'),
                     checkColor: Colors.black,
                     value: _isCheckAgreementAll,
                     onChanged: (value) {
@@ -86,7 +88,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 CheckboxListTile(
                   controlAffinity: ListTileControlAffinity.leading,
                   activeColor: Colors.blue,
-                  title: Text('서비스 이용 약관 동의 (필수)', style: TextStyle(fontSize: 14.0),),
+                  title: const Text('서비스 이용 약관 동의 (필수)', style: TextStyle(fontSize: 14.0),),
                   checkColor: Colors.black,
                     value: _isCheckAgreement1,
                     onChanged: (value) {
@@ -99,7 +101,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 CheckboxListTile(
                   controlAffinity: ListTileControlAffinity.leading,
                     activeColor: Colors.blue,
-                    title: Text('개인정보 수집 및 이용 동의 (필수)', style: TextStyle(fontSize: 14.0),),
+                    title: const Text('개인정보 수집 및 이용 동의 (필수)', style: TextStyle(fontSize: 14.0),),
                     checkColor: Colors.black,
                     value: _isCheckAgreement2,
                     onChanged: (value) {
@@ -111,7 +113,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 CheckboxListTile(
                   controlAffinity: ListTileControlAffinity.leading,
-                  title: Text('개인정보 제3자 정보제공 동의 (필수)', style: TextStyle(fontSize: 14.0),),
+                  title: const Text('개인정보 제3자 정보제공 동의 (필수)', style: TextStyle(fontSize: 14.0),),
                     activeColor: Colors.blue,
                     checkColor: Colors.black,
                     value: _isCheckAgreement3,
@@ -131,7 +133,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           _passwordconfirmController.clear();
                           _emailController.clear();
                         },
-                        child: Text('취소'),
+                        child: const Text('취소'),
                     ),
                     ElevatedButton(
                         onPressed: () {
@@ -140,12 +142,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: Text("알림"),
-                                    content: Text("모든 약관에 동의해야 합니다."),
+                                    title: const Text("알림"),
+                                    content: const Text("모든 약관에 동의해야 합니다."),
                                     actions: <Widget>[
                                       TextButton(onPressed: () {
                                         Navigator.of(context).pop();
-                                      }, child: Text("확인"))
+                                      }, child: const Text("확인"))
                                     ],
                                   );
 
@@ -159,12 +161,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: Text("알림"),
-                                    content: Text("비밀번호가 일치하지 않습니다."),
+                                    title: const Text("알림"),
+                                    content: const Text("비밀번호가 일치하지 않습니다."),
                                     actions: <Widget>[
                                       TextButton(onPressed: (){
                                         Navigator.of(context).pop();
-                                      }, child: Text("확인"))
+                                      }, child: const Text("확인"))
                                     ],
                                   );
                                 }
@@ -175,7 +177,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             Navigator.pop(context);
                           }
                         },
-                        child: Text('회원가입'),
+                        child: const Text('회원가입'),
                     )
                   ],
                 ),

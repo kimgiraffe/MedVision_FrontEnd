@@ -4,11 +4,13 @@ import 'package:my_app/pages/SignUpPage.dart';
 import '../home.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -16,11 +18,11 @@ class _LoginPageState extends State<LoginPage> {
 
   void NavigateToHome(BuildContext context) {
     if(isLoggedIn) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()),);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Home()),);
     }
     else{
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('로그인이 필요합니다.')),
+        const SnackBar(content: Text('로그인이 필요합니다.')),
       );
     }
   }
@@ -29,22 +31,22 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('로그인', textAlign: TextAlign.center, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600, color: Colors.white),
+        title: const Text('로그인', textAlign: TextAlign.center, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600, color: Colors.white),
         ),
       ),
       body: SafeArea(
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           children: <Widget>[
-            SizedBox(height: 80.0),
+            const SizedBox(height: 80.0),
             Column(
               children: <Widget>[
-                Text('나만을 위한 꼼꼼한 복약관리,', textAlign: TextAlign.center, style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
-                Text('시작해볼까요?', textAlign: TextAlign.center, style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
-                SizedBox(height: 60.0),
+                const Text('나만을 위한 꼼꼼한 복약관리,', textAlign: TextAlign.center, style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                const Text('시작해볼까요?', textAlign: TextAlign.center, style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 60.0),
                 TextField(
                   controller: _usernameController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     filled: true,
                     labelText: '아이디',
                   ),
@@ -52,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
                 TextField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     filled: true,
                     labelText: '비밀번호',
                   ),
@@ -61,14 +63,14 @@ class _LoginPageState extends State<LoginPage> {
                 ButtonBar(
                   children: <Widget>[
                     TextButton(
-                      child: Text('취소'),
+                      child: const Text('취소'),
                       onPressed: () {
                         _usernameController.clear();
                         _passwordController.clear();
                       },
                     ),
                     ElevatedButton(
-                      child: Text('로그인'),
+                      child: const Text('로그인'),
                       onPressed: () {
                         bool loginSuccess = true;
 
@@ -83,19 +85,19 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 15.0),
+                const SizedBox(height: 15.0),
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text(
+                      const Text(
                       '계정이 없으신가요? ',
                       style: TextStyle(
                         fontSize: 14.0,
                       ),
                     ),
                     InkWell(
-                      child: Text(
+                      child: const Text(
                         '회원가입',
                         style: TextStyle(
                           fontSize: 14.0,
@@ -105,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUpPage()),
+                        MaterialPageRoute(builder: (context) => const SignUpPage()),
                       );
                     },
                   ),
