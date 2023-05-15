@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:my_app/pages/AddSchedulePage.dart';
 import 'package:my_app/pages/SearchPillPage.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:my_app/pages/AuthenticationPage.dart';
+
 //import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
@@ -148,7 +150,11 @@ class HomeState extends State<Home> {
         Center(
           child:
           ElevatedButton(
-            onPressed: (){},
+            onPressed: (){
+              Navigator.push(
+                context, MaterialPageRoute(builder: (context) =>AuthenticationPage())
+              );
+            },
             child: const Text('조회하러 가기'),
           ),
         ),
