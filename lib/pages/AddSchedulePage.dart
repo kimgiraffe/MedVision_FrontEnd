@@ -20,8 +20,9 @@ class AddSchedulePageState extends State<AddSchedulePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(centerTitle: true, title: const Text('복약 일정 추가')),
-      body: Form(
+      body: SingleChildScrollView(child: Form(
         key: _formKey,
         child: Column(
           children: <Widget>[
@@ -135,6 +136,7 @@ class AddSchedulePageState extends State<AddSchedulePage> {
           ],
         ),
       ),
+      )
     );
   }
 }
