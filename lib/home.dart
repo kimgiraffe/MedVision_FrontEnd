@@ -7,7 +7,8 @@ import 'package:my_app/pages/AuthenticationPage.dart';
 //import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  final List<MedicationSchedule> medicationSchedules;
+  const Home({Key? key, this.medicationSchedules = const []}) : super(key: key);
 
   @override
   HomeState createState() => HomeState();
@@ -22,9 +23,25 @@ class HomeState extends State<Home> {
     Container(),
   ];
 
-  final List<MedicationSchedule> _medicationSchedules = [];
+  List<MedicationSchedule> _medicationSchedules = [];
   List<MedicationSchedule> selectedSchedules = [];
   final Map<DateTime, List<dynamic>> _events = {};
+
+  @override
+  void initState(){
+    super.initState();
+    _medicationSchedules = widget.medicationSchedules;
+
+    for (var schedule in _medicationSchedules) {
+      final DateTime scheduleDay = DateTime(schedule.startDate.year,schedule.startDate.month, schedule.startDate.day);
+
+      if(_events[scheduleDay] != null){
+        _events[scheduleDay]!.add(schedule);
+      } else{
+        _events[scheduleDay] = [schedule];
+      }
+    }
+  }
 
   DateTime selectedDay = DateTime(
     DateTime.now().year,
@@ -35,6 +52,9 @@ class HomeState extends State<Home> {
   DateTime focusedDay = DateTime.now();
 
   CalendarFormat format = CalendarFormat.week;
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -112,32 +132,20 @@ class HomeState extends State<Home> {
         Center(
           child:
         ElevatedButton(
-            onPressed: (){
-              Navigator.push(
+            onPressed: () async{
+              final newSchedule = await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddSchedulePage(addEvent: (medication, dosagePerOnce, dailyDose, totalDosingDays, startDate, endDate){
-                  MedicationSchedule newSchedule = MedicationSchedule(
-                    medication: medication,
-                    dosagePerOnce: dosagePerOnce,
-                    dailyDose: dailyDose,
-                    totalDosingDays: totalDosingDays,
-                    startDate: DateTime(startDate.year, startDate.month, startDate.day),
-                    endDate: DateTime(endDate.year, endDate.month, endDate.day),
-                  );
-                  setState(() {
-                    _medicationSchedules.add(newSchedule);
-                    for(int i = 0; i <= totalDosingDays; i++){
-                      DateTime date = startDate.add(Duration(days: i));
-                      DateTime keyDate = DateTime(date.year, date.month, date.day);
-                      if(_events[keyDate] != null){
-                        _events[keyDate]!.add(newSchedule);
-                      } else{
-                        _events[keyDate] = [newSchedule];
-                      }
-                    }
-                  });
-                },)),
+                MaterialPageRoute(
+                    builder: (context) => AddSchedulePage(addEvent: addEvent)
+                   ),
               );
+
+              if(newSchedule != null){
+                setState(() {
+                  //_medicationSchedules.add(newSchedule);
+                  _medicationSchedules = List.from(_medicationSchedules)..add(newSchedule);
+                });
+              }
             },
             child: const Text('복약 일정 추가')
           ),
@@ -152,7 +160,7 @@ class HomeState extends State<Home> {
           ElevatedButton(
             onPressed: (){
               Navigator.push(
-                context, MaterialPageRoute(builder: (context) =>AuthenticationPage())
+                context, MaterialPageRoute(builder: (context) => const AuthenticationPage())
               );
             },
             child: const Text('조회하러 가기'),
@@ -225,6 +233,43 @@ class HomeState extends State<Home> {
       ),
     );
   }
+
+  MedicationSchedule addEvent(
+      String medication,
+      int dosagePerOnce,
+      int dailyDose,
+      int totalDosingDays,
+      DateTime startDate,
+      DateTime endDate,
+      List<TimeOfDay> dosingTimes,
+      ) {
+
+    MedicationSchedule newSchedule = MedicationSchedule(
+      medication: medication,
+      dosagePerOnce: dosagePerOnce,
+      dailyDose: dailyDose,
+      totalDosingDays: totalDosingDays,
+      startDate: startDate,
+      endDate: endDate,
+      dosingTimes: dosingTimes,
+    );
+
+    final DateTime scheduleDay = DateTime(newSchedule.startDate.year, newSchedule.startDate.month, newSchedule.startDate.day);
+
+    if(_events[scheduleDay] != null){
+      _events[scheduleDay]!.add(newSchedule);
+    }else{
+      _events[scheduleDay] = [newSchedule];
+    }
+
+    setState(() {
+      //_medicationSchedules.add(newSchedule);
+      _medicationSchedules = List.from(_medicationSchedules)..add(newSchedule);
+    });
+
+    return newSchedule;
+  }
+
 }
 
 class Event {
@@ -256,6 +301,7 @@ class MedicationSchedule {
   int totalDosingDays;
   DateTime startDate;
   DateTime endDate;
+  List<TimeOfDay> dosingTimes;
 
   MedicationSchedule({
     required this.medication,
@@ -264,5 +310,6 @@ class MedicationSchedule {
     required this.totalDosingDays,
     required this.startDate,
     required this.endDate,
+    required this.dosingTimes,
   });
 }

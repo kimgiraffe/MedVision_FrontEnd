@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:my_app/home.dart';
+
+typedef AddEventFunction = MedicationSchedule Function(
+  String medication,
+  int dosagePerOnce,
+  int dailyDose,
+  int totalDosingDays,
+  DateTime startDate,
+  DateTime endDate,
+  List<TimeOfDay> dosingTimes
+    );
 
 class AddSchedulePage extends StatefulWidget {
-  final Function addEvent;
+  final AddEventFunction addEvent;
   const AddSchedulePage({Key? key, required this.addEvent}) : super(key: key);
 
   @override
@@ -16,10 +27,22 @@ class AddSchedulePageState extends State<AddSchedulePage> {
   int totalDosingDays = 0;
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
+  List<TimeOfDay> dosingTimes = [];
+  final dailyDoseController = TextEditingController();
+
+  @override
+  void dispose() {
+    dailyDoseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+    child: Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(centerTitle: true, title: const Text('복약 일정 추가')),
       body: SingleChildScrollView(child: Form(
@@ -41,9 +64,10 @@ class AddSchedulePageState extends State<AddSchedulePage> {
               },
             ),
             TextFormField(
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: '1회 투약량'),
               validator: (value) {
-                if(value == null || value.isEmpty) {
+                if(value == null || value.isEmpty || int.tryParse(value) == null) {
                   return '1회 투약량을 입력해주세요.';
                 }
                 return null;
@@ -55,9 +79,11 @@ class AddSchedulePageState extends State<AddSchedulePage> {
               },
             ),
             TextFormField(
+              controller: dailyDoseController,
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: '1일 투약횟수'),
               validator: (value) {
-                if(value == null || value.isEmpty) {
+                if(value == null || value.isEmpty || int.tryParse(value) == null) {
                   return '1일 투약횟수를 입력해주세요.';
                 }
                 return null;
@@ -69,9 +95,10 @@ class AddSchedulePageState extends State<AddSchedulePage> {
               },
             ),
             TextFormField(
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: '총 투약일수'),
               validator: (value) {
-                if(value == null || value.isEmpty) {
+                if(value == null || value.isEmpty || int.tryParse(value) == null) {
                   return '총 투약일수를 입력해주세요.';
                 }
                 return null;
@@ -114,6 +141,49 @@ class AddSchedulePageState extends State<AddSchedulePage> {
                 }
               },
             ),
+            ElevatedButton(
+                onPressed: () async {
+                  _formKey.currentState!.save();
+                  //print('Button pressed, dailyDose: $dailyDose');
+                  dosingTimes.clear();
+                  for(int i = 1; i <= dailyDose; i++){
+                    await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('복용 시간 선택 ($i 회)'),
+                        content: SingleChildScrollView(
+                          child: ListBody(
+                            children: <Widget>[
+                              GestureDetector(
+                                child: const Text('복용 시간을 선택하세요.'),
+                                onTap: () async {
+                                  final TimeOfDay ? picked = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                  );
+                                  if (picked != null) {
+                                    setState(() {
+                                      dosingTimes.add(picked);
+                                    });
+                                  }
+                                  Navigator.of(context).pop();
+
+                                  }
+
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                      },
+                    );
+                    //await Future.delayed(Duration(microseconds: 200));
+                    //await showTime(i);
+                  }
+                },
+                child: const Text('복용 시간 선택')
+            ),
 
             ElevatedButton(
               child: const Text('추가'),
@@ -121,22 +191,45 @@ class AddSchedulePageState extends State<AddSchedulePage> {
                 if(_formKey.currentState!.validate()){
                   _formKey.currentState!.save();
                   //print('Event to add: $medication, $dosagePerOnce, $dailyDose, $totalDosingDays, $startDate, $endDate');
-                  widget.addEvent(
+                  MedicationSchedule newSchedule = widget.addEvent(
                     medication,
                     dosagePerOnce,
                     dailyDose,
                     totalDosingDays,
                     startDate,
                     endDate,
+                    dosingTimes,
                   );
-                  Navigator.pop(context);
+                  _formKey.currentState!.reset();
+                  setState(() {
+                    medication = '';
+                    dosagePerOnce = 0;
+                    dailyDose = 0;
+                    totalDosingDays = 0;
+                    startDate = DateTime.now();
+                    endDate = DateTime.now();
+                  });
+                  Navigator.pop(context, newSchedule);
                 }
               },
-            )
+            ),
           ],
         ),
       ),
-      )
+      ),
+    ),
     );
+  }
+
+  Future<void> showTime(int doseNumber) async {
+    final TimeOfDay ? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        dosingTimes.add(picked);
+      });
+    }
   }
 }
