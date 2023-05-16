@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -38,6 +39,9 @@ class SignUpPageState extends State<SignUpPage> {
                 const SizedBox(height: 60.0),
                 TextFormField(
                   controller: _usernameController,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-z|A-Z|0-9]'))
+                  ],
                   decoration: const InputDecoration(
                     filled: true,
                     labelText: '아이디',
@@ -46,6 +50,9 @@ class SignUpPageState extends State<SignUpPage> {
                 ),
                 TextFormField(
                   controller: _passwordController,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-z|A-Z|0-9]'))
+                  ],
                   decoration: const InputDecoration(
                     filled: true,
                     labelText: '비밀번호',
@@ -54,6 +61,9 @@ class SignUpPageState extends State<SignUpPage> {
                 ),
                 TextFormField(
                   controller: _passwordconfirmController,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-z|A-Z|0-9]'))
+                  ],
                   decoration: const InputDecoration(
                     filled: true,
                     labelText: '비밀번호 재확인',
