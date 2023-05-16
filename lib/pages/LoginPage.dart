@@ -58,9 +58,6 @@ class LoginPageState extends State<LoginPage> {
               ),
                 TextField(
                   controller: _passwordController,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[a-z|A-Z|0-9]'))
-                  ],
                   decoration: const InputDecoration(
                     filled: true,
                     labelText: '비밀번호',
