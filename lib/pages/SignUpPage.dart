@@ -40,7 +40,7 @@ class SignUpPageState extends State<SignUpPage> {
                 TextFormField(
                   controller: _usernameController,
                   inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[a-z|A-Z|0-9]'))
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z|0-9]'))
                   ],
                   decoration: const InputDecoration(
                     filled: true,

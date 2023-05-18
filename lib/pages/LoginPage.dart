@@ -17,7 +17,7 @@ class LoginPageState extends State<LoginPage> {
 
   bool isLoggedIn = false;
 
-  void NavigateToHome(BuildContext context) {
+  void navigateToHome(BuildContext context) {
     if(isLoggedIn) {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Home()),);
     }
@@ -48,7 +48,7 @@ class LoginPageState extends State<LoginPage> {
                 TextField(
                   controller: _usernameController,
                   inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[a-z|A-Z|0-9]'))
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]'))
                   ],
                   decoration: const InputDecoration(
                     filled: true,
@@ -83,7 +83,7 @@ class LoginPageState extends State<LoginPage> {
                             isLoggedIn = true;
                           });
                         }
-                        NavigateToHome(context);
+                        navigateToHome(context);
                         //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()),);
                       },
                     ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
 import 'MedVision_theme.dart';
 import 'package:my_app/pages/LoginPage.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -26,7 +25,7 @@ class MedVision extends StatelessWidget {
       ],
       theme: theme,
       title: 'MedVision',
-      home: const Home(),
+      //home: const Home(),
       initialRoute: '/login',
       onGenerateRoute: _getRoute,
     );
