@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_app/pages/AddSchedulePage.dart';
+import 'package:my_app/pages/ChangePasswordPage.dart';
 import 'package:my_app/pages/LoginPage.dart';
 import 'package:my_app/pages/SearchPillPage.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -22,7 +23,7 @@ class HomeState extends State<Home> {
   static List<Widget> pages = <Widget>[
     Container(),
     SearchPillPage(),
-    Container(),
+    ChangePasswordPage(),
   ];
 
   List<MedicationSchedule> _medicationSchedules = [];
@@ -217,6 +218,10 @@ class HomeState extends State<Home> {
               icon: Icon(Icons.camera_alt),
               label: 'Camera'
           ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings'
+          ),
 
         ],
         onTap: (index) {
@@ -231,6 +236,12 @@ class HomeState extends State<Home> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SearchPillPage()),
+              );
+            }
+            else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ChangePasswordPage()),
               );
             }
           });
