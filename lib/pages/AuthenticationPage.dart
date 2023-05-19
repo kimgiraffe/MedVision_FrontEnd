@@ -1,5 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
+Future<http.Response> authenticateUser(String name, String birth, String phoneNumber, String idNumber) async {
+  String url = 'https://tilko.net/api/v1.0/hirasimpleauth/simpleauthrequest';
+  String apiKey = 'a379ba7545364b1a8e5b4c4ee040aef7';
+  String encryptedKey = '<your-encrypted-key>'; // This should be the RSA-encrypted AES secret key
+
+  Map<String, String> headers = {
+    'API-KEY': apiKey,
+    'ENC-KEY': encryptedKey,
+  };
+
+  Map<String, String> body = {
+    'Name': name,
+    'BirthDate': birth,
+    'PhoneNumber': phoneNumber,
+    'IdNumber': idNumber,
+  };
+
+  http.Response response = await http.post(
+    Uri.parse(url),
+    headers: headers,
+    body: body,
+  );
+  if (response.statusCode != 200) {
+    throw Exception('Failed to authenticate user. Status code: ${response.statusCode}');
+  }
+
+  return response;
+}
+
+
+class SimpleAuthentication extends StatefulWidget {
+  const SimpleAuthentication({Key? key}) : super(key: key);
+
+  @override
+  SimpleAuthenticationState createState() => SimpleAuthenticationState();
+}
+
+class SimpleAuthenticationState extends State<SimpleAuthentication> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Simple Authentication'),
+      ),
+      body: Center(
+        child: Text('This is the SimpleAuthentication page'),
+      ),
+    );
+  }
+}
 
 class AuthenticationPage extends StatefulWidget {
   const AuthenticationPage({Key? key}) : super(key: key);
@@ -51,17 +106,6 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                   keyboardType: TextInputType.datetime,
                 ),
                 TextFormField(
-                  controller: _idNumberController,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
-                  ],
-                  decoration: const InputDecoration(
-                    filled: true,
-                    labelText: '주민번호(  - 없이 13자리 입력하세요)',
-                  ),
-                  obscureText: true,
-                ),
-                TextFormField(
                   controller: _phoneNumberController,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
@@ -72,11 +116,20 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                   ),
                   keyboardType: TextInputType.phone,
                 ),
+                TextFormField(
+                  controller: _idNumberController,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                  ],
+                  decoration: const InputDecoration(
+                    filled: true,
+                    labelText: '주민번호(  - 없이 13자리 입력하세요)',
+                  ),
+                  obscureText: true,
+                ),
                 const SizedBox(height: 60.0),
                 ElevatedButton(
-                  onPressed: () {
-                    // 본인인증 로직 추가
-                    // 모든 필드가 채워졌는지 확인
+                  onPressed: () async {
                     if (_nameController.text.isEmpty ||
                         _birthController.text.isEmpty ||
                         _idNumberController.text.isEmpty ||
@@ -98,8 +151,42 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                             );
                           });
                     } else {
-                      // 본인인증 로직 추가
-                      // 예: 본인인증 API 호출
+                      try {
+                        var response = await authenticateUser(
+                          _nameController.text,
+                          _birthController.text,
+                          _phoneNumberController.text,
+                          _idNumberController.text,
+                        );
+
+                        // If authentication is successful
+                        if (response.statusCode == 200) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => SimpleAuthentication(),
+                            ),
+                          );
+                        } else {
+                          // handle the error
+                        }
+                      } catch (e) {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text("본인인증 오류"),
+                                content: Text("오류발생 : $e"),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text("OK"),
+                                  )
+                                ],
+                              );
+                            });
+                      }
                     }
                   },
                   child: const Text('본인인증 진행'),
