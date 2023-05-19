@@ -3,9 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 
-Future<http.Response> authenticateUser(String name, String birth, String phoneNumber, String idNumber) async {
+class PrivateAuthType {
+  final String name;
+  final int index;
+
+  PrivateAuthType(this.name, this.index);
+}
+
+
+
+Future<http.Response> authenticateUser(String privateAuthType, String name, String birth, String phoneNumber, String idNumber) async {
   String url = 'https://tilko.net/api/v1.0/hirasimpleauth/simpleauthrequest';
   String apiKey = 'a379ba7545364b1a8e5b4c4ee040aef7';
   String encryptedKey = '<your-encrypted-key>'; // This should be the RSA-encrypted AES secret key
@@ -16,10 +24,11 @@ Future<http.Response> authenticateUser(String name, String birth, String phoneNu
   };
 
   Map<String, String> body = {
-    'Name': name,
+    'PrivateAuthType': privateAuthType,
+    'UserName': name,
     'BirthDate': birth,
-    'PhoneNumber': phoneNumber,
-    'IdNumber': idNumber,
+    'UserCellphoneNumber': phoneNumber,
+    'IdentityNumber': idNumber,
   };
 
   http.Response response = await http.post(
@@ -43,6 +52,8 @@ class SimpleAuthentication extends StatefulWidget {
 }
 
 class SimpleAuthenticationState extends State<SimpleAuthentication> {
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,6 +79,17 @@ class AuthenticationPageState extends State<AuthenticationPage> {
   final _birthController = TextEditingController();
   final _idNumberController = TextEditingController();
   final _phoneNumberController = TextEditingController();
+
+  List<PrivateAuthType> _authTypes = [
+    PrivateAuthType('카카오톡', 0),
+    PrivateAuthType('페이코', 1),
+    PrivateAuthType('국민은행모바일', 2),
+    PrivateAuthType('삼성패스', 3),
+    PrivateAuthType('통신사Pass', 4),
+    PrivateAuthType('신한', 5),
+    PrivateAuthType('네이버', 6),
+  ];
+  PrivateAuthType? _selectedAuthType;
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +150,22 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                   obscureText: true,
                 ),
                 const SizedBox(height: 60.0),
+                DropdownButton<PrivateAuthType>(
+                  hint: const Text("본인인증 방식을 선택해주세요"),
+                  value: _selectedAuthType,
+                  onChanged: (PrivateAuthType? newValue) {
+                    setState(() {
+                      _selectedAuthType = newValue;
+                    });
+                  },
+                  items: _authTypes.map((PrivateAuthType authType) {
+                    return DropdownMenuItem<PrivateAuthType>(
+                      value: authType,
+                      child: Text(authType.name),
+                    );
+                  }).toList(),
+                ),
+                // In the ElevatedButton onPressed method:
                 ElevatedButton(
                   onPressed: () async {
                     if (_nameController.text.isEmpty ||
@@ -153,6 +191,7 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                     } else {
                       try {
                         var response = await authenticateUser(
+                          _selectedAuthType!.name,
                           _nameController.text,
                           _birthController.text,
                           _phoneNumberController.text,
@@ -191,6 +230,7 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                   },
                   child: const Text('본인인증 진행'),
                 ),
+
               ],
             )
           ],
