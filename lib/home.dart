@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_app/pages/AddSchedulePage.dart';
+import 'package:my_app/pages/LoginPage.dart';
 import 'package:my_app/pages/SearchPillPage.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:my_app/pages/AuthenticationPage.dart';
@@ -53,7 +55,7 @@ class HomeState extends State<Home> {
 
   CalendarFormat format = CalendarFormat.week;
 
-
+  final dateFormat = DateFormat('yyyy.MM.dd');
 
 
   @override
@@ -67,7 +69,8 @@ class HomeState extends State<Home> {
         ),
 
       ),
-      body: ListView(
+      body: SingleChildScrollView(
+        child: Column(
       children: <Widget> [
 
       TableCalendar(
@@ -170,32 +173,33 @@ class HomeState extends State<Home> {
         const Text('  최근 나의 처방 이력', style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
         const SizedBox(height: 15.0),
         SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Table(
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+          child: DataTable(
             border: TableBorder.symmetric(),
-            columnWidths: const {
-              0: FlexColumnWidth(3),
-              1: FlexColumnWidth(3),
-              2: FlexColumnWidth(3),
-              3: FlexColumnWidth(3),
-              4: FlexColumnWidth(3),
-            },
-            children: const [
-              TableRow(
-                children: [
-                  TableCell(child: Text('제조일자', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12))),
-                  TableCell(child: Text('약품명', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12))),
-                  TableCell(child: Text('1회 투약량', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12))),
-                  TableCell(child: Text('1일 투여횟수', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12))),
-                  TableCell(child: Text('총 투약일수', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12))),
-                ],
-              ),
+            columns: const <DataColumn>[
+              DataColumn(label: Text('제조일자', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+              DataColumn(label: Text('약품명', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+              DataColumn(label: Text('1회 투약량', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+              DataColumn(label: Text('1일 투여횟수', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+              DataColumn(label: Text('총 투약일수', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
 
             ],
+            rows:
+              prescriptionList.map((prescription) => DataRow(
+                cells: <DataCell> [
+                    DataCell(Text(dateFormat.format(prescription.prescriptionDate), textAlign: TextAlign.center, style: TextStyle(fontSize: 14))),
+                    DataCell(Text(prescription.medication, textAlign: TextAlign.center, style: TextStyle(fontSize: 14))),
+                    DataCell(Text('${prescription.DosagePerOnce}회', textAlign: TextAlign.center, style: TextStyle(fontSize: 14))),
+                    DataCell(Text('${prescription.DailyDose}회', textAlign: TextAlign.center, style: TextStyle(fontSize: 14))),
+                    DataCell(Text('${prescription.TotalDosingDays}일', textAlign: TextAlign.center, style: TextStyle(fontSize: 14))),
+                  ],
+              )).toList(),
+            ),
           ),
-        )
-        ])]
-      ),
+        )])
+      ])),
 
 
       //body: pages[_selectedIndex],
@@ -206,22 +210,24 @@ class HomeState extends State<Home> {
         //onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home'
+              icon: Icon(Icons.arrow_back),
+              label: 'Back'
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.camera_alt),
               label: 'Camera'
           ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.menu),
-              label: 'Menu',
-          ),
+
         ],
         onTap: (index) {
           setState(() {
-            _selectedIndex = index;
-            if(index == 1){
+            if(index == 0){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            }
+            else if(index == 1){
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SearchPillPage()),
@@ -293,6 +299,30 @@ class Prescription{
     required this.TotalDosingDays,
   });
 }
+
+List<Prescription> prescriptionList = [
+  Prescription(
+    prescriptionDate: DateTime(2023, 5, 20),
+    medication: 'Example1',
+    DosagePerOnce: 1,
+    DailyDose: 3,
+    TotalDosingDays: 7,
+  ),
+  Prescription(
+    prescriptionDate: DateTime(2023, 5, 23),
+    medication: 'Example2',
+    DosagePerOnce: 1,
+    DailyDose: 2,
+    TotalDosingDays: 3,
+  ),
+  Prescription(
+    prescriptionDate: DateTime(2023, 5, 27),
+    medication: 'Example3',
+    DosagePerOnce: 1,
+    DailyDose: 1,
+    TotalDosingDays: 3,
+  ),
+];
 
 class MedicationSchedule {
   String medication;
