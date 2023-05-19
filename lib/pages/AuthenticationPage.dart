@@ -171,7 +171,8 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                     if (_nameController.text.isEmpty ||
                         _birthController.text.isEmpty ||
                         _idNumberController.text.isEmpty ||
-                        _phoneNumberController.text.isEmpty) {
+                        _phoneNumberController.text.isEmpty ||
+                        _selectedAuthType == null) {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
