@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:my_app/pages/AddSchedulePage.dart';
 import 'package:my_app/pages/ChangePasswordPage.dart';
 import 'package:my_app/pages/LoginPage.dart';
 import 'package:my_app/pages/SearchPillPage.dart';
@@ -136,23 +136,172 @@ class HomeState extends State<Home> {
         Center(
           child:
         ElevatedButton(
-            onPressed: () async{
-              final newSchedule = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AddSchedulePage(addEvent: addEvent)
-                   ),
-              );
+            onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  String medication = ' ';
+                  int dosagePerOnce = 0;
+                  int dailyDose = 0;
+                  int totalDosingDays = 0;
+                  DateTime startDate = DateTime.now();
+                  DateTime endDate = DateTime.now();
+                  List<TimeOfDay> dosingTimes = [];
+                  return StatefulBuilder(builder: (context, setState) {
+                    return AlertDialog(
+                      title: const Text('복약 일정 추가'),
 
-              if(newSchedule != null){
-                setState(() {
-                  //_medicationSchedules.add(newSchedule);
-                  _medicationSchedules = List.from(_medicationSchedules)..add(newSchedule);
-                });
-              }
+                      content: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            onChanged: (value) {
+                              medication = value;
+                            },
+                            decoration: const InputDecoration(hintText: '약품명'),
+                          ),
+                          TextField(
+                            onChanged: (value) {
+                              dosagePerOnce = int.parse(value);
+                            },
+                            decoration: const InputDecoration(
+                                hintText: '1회 투약량'),
+                            keyboardType: TextInputType.number,
+                          ),
+                          TextField(
+                            onChanged: (value) {
+                              totalDosingDays = int.parse(value);
+                            },
+                            decoration: const InputDecoration(
+                                hintText: '1일 투여횟수'),
+                            keyboardType: TextInputType.number,
+                          ),
+                          TextField(
+                            onChanged: (value) {
+                              totalDosingDays = int.parse(value);
+                            },
+                            decoration: const InputDecoration(
+                                hintText: '총 투약일수'),
+                            keyboardType: TextInputType.number,
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              final DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: startDate,
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime.now().add(
+                                      Duration(days: 30)));
+                              if (pickedDate != null) {
+                                setState(() {
+                                  startDate = pickedDate;
+                                });
+                              }
+                            },
+                            child: Text(
+                              "시작 날짜: ${DateFormat('yyyy.MM.dd').format(
+                                  startDate)}",
+                              style: const TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              final DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: endDate,
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime.now().add(
+                                      Duration(days: 30)));
+                              if (pickedDate != null) {
+                                setState(() {
+                                  endDate = pickedDate;
+                                });
+                              }
+                            },
+                            child: Text(
+                              "종료 날짜: ${DateFormat('yyyy.MM.dd').format(
+                                  endDate)}",
+                              style: const TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              final TimeOfDay? pickedTime = await showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay.now());
+                              if (pickedTime != null &&
+                                  !dosingTimes.contains(pickedTime)) {
+                                setState(() {
+                                  dosingTimes.add(pickedTime);
+                                });
+                              }
+                            },
+                            child: const Text(
+                              "투약 시간 추가",
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                          ...dosingTimes.map(
+                                  (time) =>
+                                  ListTile(
+                                    title: Text("투약 시간: ${time.format(context)}"
+                                    ),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () {
+                                        setState(() {
+                                          dosingTimes.remove(time);
+                                        });
+                                      },
+                                    ),
+                                  )
+
+                          ).toList(),
+
+                        ],
+                      ),),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('추가'),
+                          onPressed: () {
+                            MedicationSchedule newSchedule = addEvent(
+                                medication,
+                                dosagePerOnce,
+                                dailyDose,
+                                totalDosingDays,
+                                startDate,
+                                endDate,
+                                dosingTimes);
+                            final DateTime scheduleDay = DateTime(
+                              newSchedule.startDate.year,
+                              newSchedule.startDate.month,
+                              newSchedule.startDate.day,
+                            );
+                            if(_events[scheduleDay] != null){
+                              _events[scheduleDay]!.add(newSchedule);
+                            }else{
+                              _events[scheduleDay] = [newSchedule];
+                            }
+                            setState((){
+                              _medicationSchedules = List.from(_medicationSchedules)..add(newSchedule);
+                            });
+
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(onPressed: () {
+                          Navigator.of(context).pop();
+                        }, child: const Text('취소')),
+                      ],
+                    );
+                  }
+                  );
+                },
+              );
             },
-            child: const Text('복약 일정 추가')
-          ),
+          child: const Text('복약 일정 추가'),
+        ),
         ),
         const SizedBox(height: 50.0),
         const Text('  최근 처방을 받으셨나요?'),
