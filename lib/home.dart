@@ -34,16 +34,6 @@ class HomeState extends State<Home> {
   void initState(){
     super.initState();
     _medicationSchedules = widget.medicationSchedules;
-
-    for (var schedule in _medicationSchedules) {
-      final DateTime scheduleDay = DateTime(schedule.startDate.year,schedule.startDate.month, schedule.startDate.day);
-
-      if(_events[scheduleDay] != null){
-        _events[scheduleDay]!.add(schedule);
-      } else{
-        _events[scheduleDay] = [schedule];
-      }
-    }
   }
 
   DateTime selectedDay = DateTime(
@@ -58,7 +48,6 @@ class HomeState extends State<Home> {
 
   final dateFormat = DateFormat('yyyy.MM.dd');
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,15 +57,12 @@ class HomeState extends State<Home> {
           '복용 일정 관리',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)
         ),
-
       ),
       body: SingleChildScrollView(
         child: Column(
       children: <Widget> [
 
       TableCalendar(
-      //events: _events;
-      // eventLoader: _getEvents,
 
       eventLoader: (day) {
         return _events[day] ?? [];
@@ -123,15 +109,6 @@ class HomeState extends State<Home> {
         return isSameDay(selectedDay, day);
         },
       ),
-        Column(
-          children: selectedSchedules.map((schedule) {
-            return ListTile(
-              title: Text(schedule.medication),
-              subtitle: Text('시작: ${schedule.startDate}\n종료: ${schedule.endDate}'),
-            );
-          }).toList(),
-        ),
-
         const SizedBox(height: 10.0),
         Center(
           child:
@@ -150,7 +127,6 @@ class HomeState extends State<Home> {
                   return StatefulBuilder(builder: (context, setState) {
                     return AlertDialog(
                       title: const Text('복약 일정 추가'),
-
                       content: SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -256,9 +232,7 @@ class HomeState extends State<Home> {
                                       },
                                     ),
                                   )
-
                           ).toList(),
-
                         ],
                       ),),
                       actions: <Widget>[
@@ -286,7 +260,6 @@ class HomeState extends State<Home> {
                             setState((){
                               _medicationSchedules = List.from(_medicationSchedules)..add(newSchedule);
                             });
-
                             Navigator.of(context).pop();
                           },
                         ),
@@ -334,7 +307,6 @@ class HomeState extends State<Home> {
               DataColumn(label: Text('1회 투약량', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
               DataColumn(label: Text('1일 투여횟수', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
               DataColumn(label: Text('총 투약일수', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
-
             ],
             rows:
               prescriptionList.map((prescription) => DataRow(
@@ -351,13 +323,8 @@ class HomeState extends State<Home> {
         )])
       ])),
 
-
-      //body: pages[_selectedIndex],
-
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Theme.of(context).textSelectionTheme.selectionColor,
-        //currentIndex: _selectedIndex,
-        //onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(Icons.arrow_back),
@@ -371,7 +338,6 @@ class HomeState extends State<Home> {
               icon: Icon(Icons.settings),
               label: 'Settings'
           ),
-
         ],
         onTap: (index) {
           setState(() {
@@ -420,27 +386,12 @@ class HomeState extends State<Home> {
       dosingTimes: dosingTimes,
     );
 
-    final DateTime scheduleDay = DateTime(newSchedule.startDate.year, newSchedule.startDate.month, newSchedule.startDate.day);
-
-    if(_events[scheduleDay] != null){
-      _events[scheduleDay]!.add(newSchedule);
-    }else{
-      _events[scheduleDay] = [newSchedule];
-    }
-
-    setState(() {
-      //_medicationSchedules.add(newSchedule);
-      _medicationSchedules = List.from(_medicationSchedules)..add(newSchedule);
-    });
-
     return newSchedule;
   }
-
 }
 
 class Event {
   String title;
-
   Event(this.title);
 }
 
