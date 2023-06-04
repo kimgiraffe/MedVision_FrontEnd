@@ -12,7 +12,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   Future<void> changePassword(String currentPassword, String newPassword) async {
     final response = await http.post(
-      'http://yourserver.com/changepassword' as Uri,
+      'http://localhost:8000/changepassword/' as Uri,
       body: {
         'currentPassword': currentPassword,
         'newPassword': newPassword,
