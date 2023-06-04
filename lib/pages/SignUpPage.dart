@@ -1,5 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+class SignUpFormData {
+  String? username;
+  String? password;
+  String? passwordConfirm;
+  String? email;
+
+  SignUpFormData({
+    this.username,
+    this.password,
+    this.passwordConfirm,
+    this.email,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'username' : username,
+    'password' : password,
+    'passwordconfirm' : passwordConfirm,
+    'email' : email
+  };
+}
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -9,6 +32,9 @@ class SignUpPage extends StatefulWidget {
 }
 
 class SignUpPageState extends State<SignUpPage> {
+  final formKey = GlobalKey<FormState>();
+  SignUpFormData formData = SignUpFormData();
+
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordconfirmController = TextEditingController();
@@ -20,13 +46,17 @@ class SignUpPageState extends State<SignUpPage> {
   bool _isCheckAgreement3 = false;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('회원가입', textAlign: TextAlign.center, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600, color: Colors.white)),
       ),
       body: Form(
-
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           children: <Widget>[
@@ -38,6 +68,8 @@ class SignUpPageState extends State<SignUpPage> {
 
                 const SizedBox(height: 60.0),
                 TextFormField(
+                  key: ValueKey(1),
+                  keyboardType: TextInputType.text,
                   controller: _usernameController,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z|0-9]'))
@@ -47,30 +79,48 @@ class SignUpPageState extends State<SignUpPage> {
                     labelText: '아이디',
                   ),
                   obscureText: false,
+                  onChanged: (value){
+                    formData.username = value;
+                  },
                 ),
                 TextFormField(
+                  key: ValueKey(2),
+                  keyboardType: TextInputType.text,
                   controller: _passwordController,
                   decoration: const InputDecoration(
                     filled: true,
                     labelText: '비밀번호',
                   ),
                   obscureText: true,
+                  onChanged: (value){
+                    formData.password = value;
+                  },
                 ),
                 TextFormField(
+                  key: ValueKey(3),
+                  keyboardType: TextInputType.text,
                   controller: _passwordconfirmController,
                   decoration: const InputDecoration(
                     filled: true,
                     labelText: '비밀번호 재확인',
                   ),
                   obscureText: true,
+                  onChanged: (value){
+                    formData.passwordConfirm = value;
+                  },
                 ),
                 TextFormField(
+                  key: ValueKey(4),
+                  keyboardType: TextInputType.emailAddress,
                   controller: _emailController,
                   decoration: const InputDecoration(
                     filled: true,
                     labelText: '이메일 주소',
                   ),
                   obscureText: false,
+                  onChanged: (value){
+                    formData.email = value;
+                  },
                 ),
                 const SizedBox(height: 5.0),
                 CheckboxListTile(
@@ -139,7 +189,7 @@ class SignUpPageState extends State<SignUpPage> {
                         child: const Text('취소'),
                     ),
                     ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if(!_isCheckAgreement1 || !_isCheckAgreement2 || !_isCheckAgreement3) {
                             showDialog(
                                 context: context,
@@ -177,7 +227,14 @@ class SignUpPageState extends State<SignUpPage> {
                           }
                           else {
                             //TODO: 회원가입 로직 (서버에 정보 전송 등)
-                            Navigator.pop(context);
+                            var response = await http.post(
+                              Uri.parse('http://localhost:8000/signup/'),
+                              body: json.encode(formData.toJson()),
+                              headers: {'content-type' : 'application/json'}
+                            );
+                            if(response.statusCode == 201) {_showDialog('회원가입 성공');}
+                            else {_showDialog('회원가입 실패');}
+                            //Navigator.pop(context);
                           }
                         },
                         child: const Text('회원가입'),
@@ -189,6 +246,21 @@ class SignUpPageState extends State<SignUpPage> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showDialog(String message){
+    showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('확인'),
+            ),
+          ],
+        )
     );
   }
 }
