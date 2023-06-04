@@ -21,6 +21,7 @@ Future<http.Response> authenticateUser(String privateAuthType, String name, Stri
   Map<String, String> headers = {
     'API-KEY': apiKey,
     'ENC-KEY': encryptedKey,
+    'Content-Type': 'application/json', // This line is added
   };
 
   Map<String, String> body = {
@@ -34,7 +35,7 @@ Future<http.Response> authenticateUser(String privateAuthType, String name, Stri
   http.Response response = await http.post(
     Uri.parse(url),
     headers: headers,
-    body: body,
+    body: json.encode(body),  // You need to convert the body to a json string
   );
   if (response.statusCode != 200) {
     throw Exception('Failed to authenticate user. Status code: ${response.statusCode}');
@@ -171,8 +172,8 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                     if (_nameController.text.isEmpty ||
                         _birthController.text.isEmpty ||
                         _idNumberController.text.isEmpty ||
-                        _phoneNumberController.text.isEmpty ||
-                        _selectedAuthType == null) {
+                        _phoneNumberController.text.isEmpty
+                    ) {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -192,7 +193,7 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                     } else {
                       try {
                         var response = await authenticateUser(
-                          _selectedAuthType!.name,
+                          _selectedAuthType!.index.toString(),
                           _nameController.text,
                           _birthController.text,
                           _phoneNumberController.text,
@@ -201,13 +202,17 @@ class AuthenticationPageState extends State<AuthenticationPage> {
 
                         // If authentication is successful
                         if (response.statusCode == 200) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => SimpleAuthentication(),
-                            ),
-                          );
-                        } else {
-                          // handle the error
+                          showDialog(context: context, builder: (BuildContext context){
+                            return AlertDialog(
+                              title: const Text("알림"),
+                              content: const Text('본인인증 호출 성공'),
+                              actions: <Widget>[
+                                TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("확인"),)
+                              ],
+                            );
+                          });
+                        }else {
+                          throw Exception('Unexpected status code: ${response.statusCode}');
                         }
                       } catch (e) {
                         showDialog(
@@ -215,7 +220,11 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                             builder: (BuildContext context) {
                               return AlertDialog(
                                 title: const Text("본인인증 오류"),
-                                content: Text("오류발생 : $e"),
+                                content: Column(
+                                  children: [
+                                    Text("오류발생 : $e"),
+                                  ],
+                                ),
                                 actions: <Widget>[
                                   TextButton(
                                     onPressed: () {
@@ -225,7 +234,9 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                                   )
                                 ],
                               );
-                            });
+                            }
+                        );
+
                       }
                     }
                   },
@@ -240,3 +251,4 @@ class AuthenticationPageState extends State<AuthenticationPage> {
     );
   }
 }
+
