@@ -413,25 +413,32 @@ class Prescription{
 
 List<Prescription> prescriptionList = [
   Prescription(
-    prescriptionDate: DateTime(2023, 5, 20),
-    medication: 'Example1',
+    prescriptionDate: DateTime(2023, 6, 2),
+    medication: '뉴토리드정',
     DosagePerOnce: 1,
     DailyDose: 3,
-    TotalDosingDays: 7,
-  ),
-  Prescription(
-    prescriptionDate: DateTime(2023, 5, 23),
-    medication: 'Example2',
-    DosagePerOnce: 1,
-    DailyDose: 2,
     TotalDosingDays: 3,
   ),
   Prescription(
-    prescriptionDate: DateTime(2023, 5, 27),
-    medication: 'Example3',
+    prescriptionDate: DateTime(2023, 6, 2),
+    medication: '뉴파클러캡슐',
+    DosagePerOnce: 1,
+    DailyDose: 3,
+    TotalDosingDays: 3,
+  ),
+  Prescription(
+    prescriptionDate: DateTime(2023, 6, 2),
+    medication: '베포탄서방정',
     DosagePerOnce: 1,
     DailyDose: 1,
     TotalDosingDays: 3,
+  ),
+  Prescription(
+    prescriptionDate: DateTime(2023, 6, 2),
+    medication: '모니필정350밀리그램',
+    DosagePerOnce: 1,
+    DailyDose: 3,
+    TotalDosingDays: 2,
   ),
 ];
 
