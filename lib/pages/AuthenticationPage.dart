@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
 class PrivateAuthType {
   final String name;
   final int index;
@@ -11,21 +10,11 @@ class PrivateAuthType {
   PrivateAuthType(this.name, this.index);
 }
 
+Future<http.Response> authenticateUser(PrivateAuthType privateAuthType, String name, String birth, String phoneNumber, String idNumber) async {
+  String url = 'http://localhost:8000/druginfo/';  // 이 부분은 실제 백엔드 라우트로 변경되어야 합니다.
 
-
-Future<http.Response> authenticateUser(String privateAuthType, String name, String birth, String phoneNumber, String idNumber) async {
-  String url = 'https://tilko.net/api/v1.0/hirasimpleauth/simpleauthrequest';
-  String apiKey = 'a379ba7545364b1a8e5b4c4ee040aef7';
-  String encryptedKey = '<your-encrypted-key>'; // This should be the RSA-encrypted AES secret key
-
-  Map<String, String> headers = {
-    'API-KEY': apiKey,
-    'ENC-KEY': encryptedKey,
-    'Content-Type': 'application/json', // This line is added
-  };
-
-  Map<String, String> body = {
-    'PrivateAuthType': privateAuthType,
+  Map<String, dynamic> body = {
+    'PrivateAuthType': privateAuthType.index.toString(),  // Now you can serialize the object to JSON.
     'UserName': name,
     'BirthDate': birth,
     'UserCellphoneNumber': phoneNumber,
@@ -34,15 +23,25 @@ Future<http.Response> authenticateUser(String privateAuthType, String name, Stri
 
   http.Response response = await http.post(
     Uri.parse(url),
-    headers: headers,
-    body: json.encode(body),  // You need to convert the body to a json string
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode(body),
   );
-  if (response.statusCode != 200) {
-    throw Exception('Failed to authenticate user. Status code: ${response.statusCode}');
+  print('Request data: ${response.request}');
+  print('Response status: ${response.statusCode}');
+  print('Response body: ${response.body}');
+
+  if (response.statusCode >= 400) {
+    throw Exception('Failed to authenticate user. Status code: ${response.statusCode}, Error: ${response.body}');
   }
 
   return response;
 }
+
+
+
+
+
+
 
 
 class SimpleAuthentication extends StatefulWidget {
@@ -193,25 +192,39 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                     } else {
                       try {
                         var response = await authenticateUser(
-                          _selectedAuthType!.index.toString(),
+                          _selectedAuthType!,
                           _nameController.text,
                           _birthController.text,
                           _phoneNumberController.text,
                           _idNumberController.text,
                         );
 
-                        // If authentication is successful
+
                         if (response.statusCode == 200) {
-                          showDialog(context: context, builder: (BuildContext context){
-                            return AlertDialog(
-                              title: const Text("알림"),
-                              content: const Text('본인인증 호출 성공'),
-                              actions: <Widget>[
-                                TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("확인"),)
-                              ],
-                            );
-                          });
-                        }else {
+                          Map<String, dynamic> responseData = json.decode(response.body);
+                          if (responseData['Status'] == 'OK') {
+                            showDialog(context: context, builder: (BuildContext context){
+                              return AlertDialog(
+                                title: const Text("알림"),
+                                content: Text('본인인증 성공\nToken: ${responseData['ResultData']['Token']}'),
+                                actions: <Widget>[
+                                  TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("확인"),)
+                                ],
+                              );
+                            });
+                          } else if (responseData['Status'] == 'Error') {
+                            showDialog(context: context, builder: (BuildContext context){
+                              return AlertDialog(
+                                title: const Text("본인인증 오류"),
+                                content: Text('에러 message: ${responseData['Message']}'),
+                                actions: <Widget>[
+                                  TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("OK"),)
+                                ],
+                              );
+                            });
+                          }
+                        }
+                        else {
                           throw Exception('Unexpected status code: ${response.statusCode}');
                         }
                       } catch (e) {
