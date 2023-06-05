@@ -21,11 +21,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('비밀번호가 변경되었습니다.')),
+        const SnackBar(content: Text('비밀번호가 변경되었습니다.')),
       );
+      Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('비밀번호 변경에 실패하였습니다.')),
+        const SnackBar(content: Text('비밀번호 변경에 실패하였습니다.')),
       );
     }
   }
@@ -34,28 +35,29 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('비밀번호 변경'),
+        centerTitle: true,
+        title: const Text('비밀번호 변경'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             TextField(
               controller: _currentPasswordController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: '현재 비밀번호',
               ),
               obscureText: true,
             ),
             TextField(
               controller: _newPasswordController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: '새 비밀번호',
               ),
               obscureText: true,
             ),
             ElevatedButton(
-              child: Text('비밀번호 변경'),
+              child: const Text('비밀번호 변경'),
               onPressed: () {
                 changePassword(
                   _currentPasswordController.text,

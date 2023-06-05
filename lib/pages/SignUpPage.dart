@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../home.dart';
+
 class SignUpFormData {
   String? username;
   String? password;
@@ -55,6 +57,7 @@ class SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('회원가입', textAlign: TextAlign.center, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600, color: Colors.white)),
+        centerTitle: true,
       ),
       body: Form(
         child: ListView(
@@ -227,13 +230,14 @@ class SignUpPageState extends State<SignUpPage> {
                           }
                           else {
                             //TODO: 회원가입 로직 (서버에 정보 전송 등)
-                            var response = await http.post(
+                            /*var response = await http.post(
                               Uri.parse('http://localhost:8000/signup/'),
                               body: json.encode(formData.toJson()),
                               headers: {'content-type' : 'application/json'}
                             );
                             if(response.statusCode == 201) {_showDialog('회원가입 성공');}
-                            else {_showDialog('회원가입 실패');}
+                            else {_showDialog('회원가입 실패');}*/
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> const Home()));
                             //Navigator.pop(context);
                           }
                         },
