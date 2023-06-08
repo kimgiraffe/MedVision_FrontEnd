@@ -10,39 +10,23 @@ class PrivateAuthType {
   PrivateAuthType(this.name, this.index);
 }
 
-Future<http.Response> authenticateUser(PrivateAuthType privateAuthType, String name, String birth, String phoneNumber, String idNumber) async {
+Future<void> sendUserInfoToServer(PrivateAuthType privateAuthType, String name, String birth, String phoneNumber, String idNumber) async {
   String url = 'http://localhost:8000/druginfo/';  // 이 부분은 실제 백엔드 라우트로 변경되어야 합니다.
 
   Map<String, dynamic> body = {
-    'PrivateAuthType': privateAuthType.index.toString(),  // Now you can serialize the object to JSON.
+    'PrivateAuthType': privateAuthType.index.toString(),
     'UserName': name,
     'BirthDate': birth,
     'UserCellphoneNumber': phoneNumber,
     'IdentityNumber': idNumber,
   };
 
-  http.Response response = await http.post(
+  await http.post(
     Uri.parse(url),
     headers: {'Content-Type': 'application/json'},
     body: json.encode(body),
   );
-  print('Request data: ${response.request}');
-  print('Response status: ${response.statusCode}');
-  print('Response body: ${response.body}');
-
-  if (response.statusCode >= 400) {
-    throw Exception('Failed to authenticate user. Status code: ${response.statusCode}, Error: ${response.body}');
-  }
-
-  return response;
 }
-
-
-
-
-
-
-
 
 class SimpleAuthentication extends StatefulWidget {
   const SimpleAuthentication({Key? key}) : super(key: key);
@@ -52,8 +36,6 @@ class SimpleAuthentication extends StatefulWidget {
 }
 
 class SimpleAuthenticationState extends State<SimpleAuthentication> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,8 +74,16 @@ class AuthenticationPageState extends State<AuthenticationPage> {
   PrivateAuthType? _selectedAuthType;
 
   @override
+
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: Scaffold(
       appBar: AppBar(
         title: const Text('본인인증', textAlign: TextAlign.center, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600, color: Colors.white)),
       ),
@@ -165,7 +155,6 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                     );
                   }).toList(),
                 ),
-                // In the ElevatedButton onPressed method:
                 ElevatedButton(
                   onPressed: () async {
                     if (_nameController.text.isEmpty ||
@@ -191,42 +180,13 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                           });
                     } else {
                       try {
-                        var response = await authenticateUser(
+                        await sendUserInfoToServer(
                           _selectedAuthType!,
                           _nameController.text,
                           _birthController.text,
                           _phoneNumberController.text,
                           _idNumberController.text,
                         );
-
-
-                        if (response.statusCode == 200) {
-                          Map<String, dynamic> responseData = json.decode(response.body);
-                          if (responseData['Status'] == 'OK') {
-                            showDialog(context: context, builder: (BuildContext context){
-                              return AlertDialog(
-                                title: const Text("알림"),
-                                content: Text('본인인증 성공\nToken: ${responseData['ResultData']['Token']}'),
-                                actions: <Widget>[
-                                  TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("확인"),)
-                                ],
-                              );
-                            });
-                          } else if (responseData['Status'] == 'Error') {
-                            showDialog(context: context, builder: (BuildContext context){
-                              return AlertDialog(
-                                title: const Text("본인인증 오류"),
-                                content: Text('에러 message: ${responseData['Message']}'),
-                                actions: <Widget>[
-                                  TextButton(onPressed: (){Navigator.of(context).pop();}, child: const Text("OK"),)
-                                ],
-                              );
-                            });
-                          }
-                        }
-                        else {
-                          throw Exception('Unexpected status code: ${response.statusCode}');
-                        }
                       } catch (e) {
                         showDialog(
                             context: context,
@@ -249,19 +209,17 @@ class AuthenticationPageState extends State<AuthenticationPage> {
                               );
                             }
                         );
-
                       }
                     }
                   },
                   child: const Text('본인인증 진행'),
                 ),
-
               ],
             )
           ],
         ),
       ),
+    ),
     );
   }
 }
-
