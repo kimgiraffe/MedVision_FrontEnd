@@ -276,6 +276,21 @@ class HomeState extends State<Home> {
           child: const Text('복약 일정 추가'),
         ),
         ),
+        Column(
+          children: _medicationSchedules.map((_medicationSchedules) {
+            return ListTile(
+              title: Text(_medicationSchedules.medication),
+              subtitle: Text(
+                '1회 투약량: ${_medicationSchedules.dosagePerOnce}\n'
+                    '1일 투여횟수: ${_medicationSchedules.dailyDose}\n'
+                    '총 투약일수: ${_medicationSchedules.totalDosingDays}\n'
+                    '복용 시작일: ${dateFormat.format(_medicationSchedules.startDate)}\n'
+                    '복용 종료일: ${dateFormat.format(_medicationSchedules.endDate)}\n'
+                    '복용 시각: ${_medicationSchedules.dosingTimes.map((time) => time.format(context)).join(', ')}'
+              ),
+            );
+          }).toList(),
+        ),
         const SizedBox(height: 50.0),
         const Text('  최근 처방을 받으셨나요?'),
         const Text("  심평원 '내가 먹는 약' 서비스로 조회해보세요"),
